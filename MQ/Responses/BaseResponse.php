@@ -52,10 +52,19 @@ abstract class BaseResponse
 
     protected function loadAndValidateXmlContent($content, &$xmlReader)
     {
+        // ====================== 核心修复：清洗非法字符 ======================
+        // 过滤 XML 不允许的非法字符：0xFFFE / 0x00~0x1F 等乱码
+        $content = preg_replace('/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $content);
+        libxml_use_internal_errors(true); // 屏蔽 XML 错误警告
+        
         $doc = new \DOMDocument();
         if(!$doc->loadXML($content)) {
+            libxml_clear_errors();
+            
             return false;
         }
+        libxml_clear_errors();
+        
         $xmlReader = $this->loadXmlContent($content);
         return true;
     }

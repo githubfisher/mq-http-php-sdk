@@ -12,12 +12,12 @@ class MQTransProducer extends MQProducer
 {
     private $groupId;
 
-    function __construct(HttpClient $client, $instanceId = NULL, $topicName, $groupId)
+    function __construct(HttpClient $client, $topicName, $groupId, $instanceId = NULL)
     {
         if (empty($groupId)) {
             throw new InvalidArgumentException(400, "GroupId is null");
         }
-        parent::__construct($client, $instanceId, $topicName);
+        parent::__construct($client, $topicName, $instanceId);
         $this->groupId = $groupId;
     }
 

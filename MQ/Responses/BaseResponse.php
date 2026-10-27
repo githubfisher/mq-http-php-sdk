@@ -12,7 +12,7 @@ abstract class BaseResponse
 
     abstract public function parseResponse($statusCode, $content);
 
-    abstract public function parseErrorResponse($statusCode, $content, MQException $exception = NULL);
+    abstract public function parseErrorResponse($statusCode, $content, ?MQException $exception = null);
 
     public function isSucceed()
     {

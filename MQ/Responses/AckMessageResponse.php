@@ -26,7 +26,7 @@ class AckMessageResponse extends BaseResponse
         }
     }
 
-    public function parseErrorResponse($statusCode, $content, MQException $exception = NULL)
+    public function parseErrorResponse($statusCode, $content, ?MQException $exception = null)
     {
         $this->succeed = FALSE;
         $xmlReader = $this->loadXmlContent($content);

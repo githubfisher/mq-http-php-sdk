@@ -25,7 +25,7 @@ class HttpClient
     private $agent;
 
     public function __construct($endPoint, $accessId,
-        $accessKey, $securityToken = NULL, Config $config = NULL)
+        $accessKey, $securityToken = NULL, ?Config $config = null)
     {
         if ($config == NULL)
         {
@@ -33,15 +33,15 @@ class HttpClient
         }
         $this->accessId = $accessId;
         $this->accessKey = $accessKey;
+        // Guzzle 7: request options must be passed at the top level,
+        // the 'defaults' wrapper was removed after Guzzle 5.
         $this->client = new \GuzzleHttp\Client([
             'base_uri' => $endPoint,
-            'defaults' => [
-                'headers' => [
-                    'Host' => $endPoint
-                ],
-                'proxy' => $config->getProxy(),
-                'expect' => $config->getExpectContinue()
-            ]
+            'headers' => [
+                'Host' => $endPoint
+            ],
+            'proxy' => $config->getProxy(),
+            'expect' => $config->getExpectContinue()
         ]);
         $this->requestTimeout = $config->getRequestTimeout();
         $this->connectTimeout = $config->getConnectTimeout();
@@ -67,7 +67,7 @@ class HttpClient
         $request->setHeader(Constants::USER_AGENT, $this->agent);
         if ($body != NULL)
         {
-            $request->setHeader(Constants::CONTENT_LENGTH, strlen($body));
+            $request->setHeader(Constants::CONTENT_LENGTH, (string)strlen($body));
         }
         $request->setHeader('Date', gmdate(Constants::GMT_DATE_FORMAT));
         if (!$request->isHeaderSet(Constants::CONTENT_TYPE))
@@ -87,7 +87,7 @@ class HttpClient
     }
 
     public function sendRequestAsync(BaseRequest $request,
-        BaseResponse &$response, AsyncCallback $callback = NULL)
+        BaseResponse &$response, ?AsyncCallback $callback = null)
     {
         $promise = $this->sendRequestAsyncInternal($request, $response, $callback);
         return new MQPromise($promise, $response);
@@ -99,7 +99,7 @@ class HttpClient
         return $promise->wait();
     }
 
-    private function sendRequestAsyncInternal(BaseRequest &$request, BaseResponse &$response, AsyncCallback $callback = NULL)
+    private function sendRequestAsyncInternal(BaseRequest &$request, BaseResponse &$response, ?AsyncCallback $callback = null)
     {
         $this->addRequiredHeaders($request);
 

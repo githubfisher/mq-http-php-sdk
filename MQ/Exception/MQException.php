@@ -9,7 +9,7 @@ class MQException extends \RuntimeException
 
     public function __construct($code, $message, $previousException = NULL, $onsErrorCode = NULL, $requestId = NULL, $hostId = NULL)
     {
-        parent::__construct($message, $code, $previousException);
+        parent::__construct($message, (int)$code, $previousException);
 
         if ($onsErrorCode == NULL)
         {

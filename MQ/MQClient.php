@@ -19,7 +19,7 @@ class MQClient
      * @param config: necessary configs
      */
     public function __construct($endPoint, $accessId,
-        $accessKey, $securityToken = NULL, Config $config = NULL)
+        $accessKey, $securityToken = NULL, ?Config $config = null)
     {
         if (empty($endPoint)) {
             throw new InvalidArgumentException(400, "Invalid endpoint");
@@ -48,7 +48,7 @@ class MQClient
         if ($topicName == NULL || $topicName == "") {
             throw new InvalidArgumentException(400, "TopicName is null or empty");
         }
-        return new MQProducer($this->client, $instanceId, $topicName);
+        return new MQProducer($this->client, $topicName, $instanceId);
     }
 
     /**
@@ -65,7 +65,7 @@ class MQClient
         if ($topicName == NULL || $topicName == "") {
             throw new InvalidArgumentException(400, "TopicName is null or empty");
         }
-        return new MQTransProducer($this->client, $instanceId, $topicName, $groupId);
+        return new MQTransProducer($this->client, $topicName, $groupId, $instanceId);
     }
 
     /**
@@ -86,7 +86,7 @@ class MQClient
         if ($consumer == NULL || $consumer == "" ) {
             throw new InvalidArgumentException(400, "Consumer is null or empty");
         }
-        return new MQConsumer($this->client, $instanceId, $topicName, $consumer, $messageTag);
+        return new MQConsumer($this->client, $topicName, $consumer, $messageTag, $instanceId);
     }
 
 }

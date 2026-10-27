@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [master, "feature/**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.4", "8.5"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, xmlreader
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Lint all sources
+        run: find MQ sample.php -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Smoke test (no deprecations allowed)
+        run: |
+          php -r '
+          error_reporting(E_ALL);
+          set_error_handler(function ($no, $str, $file, $line) {
+              fwrite(STDERR, "PHP[$no] $str at $file:$line\n");
+              exit(1);
+          });
+          require "vendor/autoload.php";
+          $client = new MQ\MQClient("http://localhost:1", "ak", "sk");
+          $client->getProducer(NULL, "abc");
+          $client->getConsumer(NULL, "abc", "GID-abc");
+          $client->getTransProducer(NULL, "abc", "GID-tx");
+          new MQ\Http\HttpClient("http://localhost:1", "ak", "sk", NULL, NULL);
+          new MQ\AsyncCallback(function ($r) {}, function ($e) {});
+          echo "OK\n";
+          '

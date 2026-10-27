@@ -20,7 +20,7 @@ class MQConsumer
     private $client;
 
 
-    function __construct(HttpClient $client, $instanceId = NULL, $topicName, $consumer, $messageTag = NULL)
+    function __construct(HttpClient $client, $topicName, $consumer, $messageTag = NULL, $instanceId = NULL)
     {
         if (empty($topicName)) {
             throw new InvalidArgumentException(400, "TopicName is null");

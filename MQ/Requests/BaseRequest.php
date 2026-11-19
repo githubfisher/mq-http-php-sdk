@@ -60,7 +60,20 @@ abstract class BaseRequest
 
     public function setHeader($header, $value)
     {
-        $this->headers[$header] = $value;
+        // psr7 2.11+ deprecates non-string header values and 3.0 rejects them.
+        if (is_array($value))
+        {
+            if ($value === array())
+            {
+                unset($this->headers[$header]);
+                return;
+            }
+            $this->headers[$header] = array_map('strval', $value);
+        }
+        else
+        {
+            $this->headers[$header] = (string)$value;
+        }
     }
 
     public function getResourcePath()
